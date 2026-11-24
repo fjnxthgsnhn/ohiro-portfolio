@@ -50,6 +50,10 @@ async function handleContact(request, env, ctx) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, error: "email" }, 400);
 
   const ip = request.headers.get("cf-connecting-ip") || "";
+  // Cloudflare Turnstile（ロボット確認）のトークンを検証する。通らなければ保存も通知もしない
+  if (!(await verifyTurnstile(env, String(data["cf-turnstile-response"] || ""), ip, new URL(request.url).hostname)))
+    return json({ ok: false, error: "captcha" }, 403);
+
   const { n } = await env.DB.prepare(
     "SELECT COUNT(*) AS n FROM messages WHERE ip = ? AND created_at > datetime('now', '-1 hour')"
   ).bind(ip).first();
@@ -62,6 +66,26 @@ async function handleContact(request, env, ctx) {
   // 保存できた時点で成功。Discord への通知は応答のあとで行う
   ctx.waitUntil(notifyDiscord(env, meta.last_row_id, { name, email, topic, message }));
   return json({ ok: true });
+}
+
+async function verifyTurnstile(env, token, ip, hostname) {
+  if (!env.TURNSTILE_SECRET) { console.error("TURNSTILE_SECRET is not set"); return false; }
+  if (!token || token.length > 2048) return false;
+  const body = new FormData();
+  body.append("secret", env.TURNSTILE_SECRET);
+  body.append("response", token);
+  if (ip) body.append("remoteip", ip);
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
+    const r = await res.json();
+    // 本番では、このサイトで発行されたトークンかどうかも確かめる（テスト用キーは hostname が example.com になる）
+    const hostOk = r.hostname === hostname || hostname === "localhost" || hostname === "127.0.0.1";
+    if (!r.success || !hostOk) console.warn("turnstile rejected", r["error-codes"], r.hostname);
+    return r.success === true && hostOk;
+  } catch (e) {
+    console.error("turnstile verify failed", e);
+    return false;
+  }
 }
 
 async function notifyDiscord(env, id, m) {

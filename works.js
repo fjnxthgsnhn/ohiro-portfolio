@@ -11,9 +11,11 @@ window.PROFILE = {
     { label: "YouTube", url: "https://www.youtube.com/@oohirochan" },
     { label: "X", url: "https://x.com/oohiro35" },
   ],
-  // 問い合わせフォームの送信先（Formspree などのフォーム受付サービスの URL）。
+  // 問い合わせフォームの送信先（src/worker.js の /api/contact）。
   // 空のあいだはフォームは仮表示で、送信ボタンは押せません。
   contactAction: "/api/contact",
+  // Cloudflare Turnstile のサイトキー（公開してよい値。秘密鍵は Worker の Secret TURNSTILE_SECRET）
+  turnstileSiteKey: "0x4AAAAAAGQCx-6GSc8sDbt8",
 };
 
 window.WORKS = [

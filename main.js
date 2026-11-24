@@ -35,7 +35,27 @@
   const btn = form.querySelector("button");
   if (P.contactAction) {
     form.action = P.contactAction;
+    // Turnstile：フォームが近づいたら読み込んで表示する（ローカルでは常に通るテスト用キー）
+    const local = ["localhost", "127.0.0.1"].includes(location.hostname);
+    const siteKey = local ? "1x00000000000000000000AA" : P.turnstileSiteKey;
+    let widget = null;
+    const renderTurnstile = () => {
+      if (widget !== null || !window.turnstile) return;
+      widget = window.turnstile.render("#turnstile", { sitekey: siteKey, theme: "dark", language: "ja", action: "contact" });
+    };
+    window.onTurnstileLoad = renderTurnstile;
+    if (siteKey) {
+      const load = () => document.head.append(el("script", {
+        src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad", async: "", defer: "",
+      }));
+      new IntersectionObserver((entries, io) => {
+        if (entries.some((e) => e.isIntersecting)) { io.disconnect(); load(); }
+      }, { rootMargin: "400px" }).observe(form);
+    }
+    const resetTurnstile = () => { if (widget !== null && window.turnstile) window.turnstile.reset(widget); };
+
     const errors = {
+      captcha: "ロボットでないことの確認が終わっていません。確認欄が完了してから、もう一度送信してください。",
       rate_limited: "短時間に送信が続いたため受け付けられませんでした。しばらくしてからお試しください。",
       email: "メールアドレスの形式をご確認ください。",
       too_long: "入力が長すぎます。内容を短くしてお試しください。",
@@ -47,6 +67,7 @@
       try {
         const res = await fetch(form.action, { method: "POST", body: new FormData(form) });
         const r = await res.json().catch(() => ({}));
+        resetTurnstile(); // トークンは 1 回しか使えないので、結果にかかわらず取り直す
         if (res.ok && r.ok) {
           form.reset();
           note.textContent = "送信しました。お問い合わせありがとうございます。内容を確認のうえご連絡します。";
@@ -54,6 +75,7 @@
         }
         note.textContent = errors[r.error] || "送信できませんでした。時間をおいて再度お試しいただくか、X の DM からご連絡ください。";
       } catch {
+        resetTurnstile();
         note.textContent = "通信エラーで送信できませんでした。時間をおいて再度お試しください。";
       }
       btn.disabled = false;

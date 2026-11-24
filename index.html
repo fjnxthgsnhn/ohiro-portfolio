@@ -85,6 +85,8 @@
         <label class="wide">内容<textarea name="message" rows="6" maxlength="5000" required></textarea></label>
         <!-- ボット対策（人には見えない欄） -->
         <label class="hp" aria-hidden="true">Website<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+        <!-- ロボット確認（Cloudflare Turnstile）。フォームが見えてきたら読み込む -->
+        <div class="wide turnstile" id="turnstile"></div>
         <div class="wide form-foot">
           <button type="submit" class="btn btn-solid">送信する</button>
           <p class="form-note" id="form-note"></p>

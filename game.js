@@ -154,6 +154,9 @@
         bird.angle = Math.atan2(bird.vy, Math.abs(bird.vx) + 1);
         collide();
         if (bird.y >= GROUND - R) touchGround();
+        // 念のため：空中でほとんど動かない状態が続いたら前へ押し出す
+        bird.stuck = Math.hypot(bird.vx, bird.vy) < 30 ? (bird.stuck || 0) + dt : 0;
+        if (bird.stuck > 0.5) { bird.stuck = 0; bird.vx = Math.max(bird.vx, 90); bird.vy = -90; }
         if (bird.y < -2000) bird.y = -2000; // 打ち上がりすぎ防止
       } else {
         bird.vx -= Math.sign(bird.vx) * frictionAt(bird.x) * G * dt;
@@ -196,6 +199,11 @@
             it.flash = 0.2;
             burst(bird.x, bird.y, "#f3e6c8", 10);
             popup(it.x, it.y - 16, "ドン!", "#ffd6a0");
+          }
+          // 書類の上に弱く乗ったときは、小さく跳ねさせて前へ転がり落とす（上に乗ったまま止まるのを防ぐ）
+          if (ny < -0.5 && bird.vy > -90) {
+            bird.vy = -90;
+            bird.vx = Math.max(bird.vx, 80);
           }
         }
       } else if (!it.used && !it.hit && Math.abs(it.x - bird.x) < it.w / 2 + R - 2 && Math.abs(it.y - bird.y) < it.h / 2 + R - 2) {
