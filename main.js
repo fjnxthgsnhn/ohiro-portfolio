@@ -31,11 +31,36 @@
 
   // 問い合わせフォーム（送信先が未設定のあいだは仮表示）
   const form = $("#contact-form");
+  const note = $("#form-note");
+  const btn = form.querySelector("button");
   if (P.contactAction) {
     form.action = P.contactAction;
+    const errors = {
+      rate_limited: "短時間に送信が続いたため受け付けられませんでした。しばらくしてからお試しください。",
+      email: "メールアドレスの形式をご確認ください。",
+      too_long: "入力が長すぎます。内容を短くしてお試しください。",
+    };
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      note.textContent = "送信しています…";
+      try {
+        const res = await fetch(form.action, { method: "POST", body: new FormData(form) });
+        const r = await res.json().catch(() => ({}));
+        if (res.ok && r.ok) {
+          form.reset();
+          note.textContent = "送信しました。お問い合わせありがとうございます。内容を確認のうえご連絡します。";
+          return;
+        }
+        note.textContent = errors[r.error] || "送信できませんでした。時間をおいて再度お試しいただくか、X の DM からご連絡ください。";
+      } catch {
+        note.textContent = "通信エラーで送信できませんでした。時間をおいて再度お試しください。";
+      }
+      btn.disabled = false;
+    });
   } else {
-    form.querySelector("button").disabled = true;
-    $("#form-note").textContent = "※ 現在フォームは準備中です。お急ぎの方は X の DM からご連絡ください。";
+    btn.disabled = true;
+    note.textContent = "※ 現在フォームは準備中です。お急ぎの方は X の DM からご連絡ください。";
     form.addEventListener("submit", (e) => e.preventDefault());
   }
 

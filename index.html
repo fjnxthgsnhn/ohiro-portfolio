@@ -73,8 +73,8 @@
       <h2 class="section-title"><span>Contact</span>お問い合わせ</h2>
       <p class="contact-lead">映像制作のご依頼・ご相談はこちらから。</p>
       <form id="contact-form" class="form" method="POST">
-        <label>お名前<input name="name" type="text" autocomplete="name" required></label>
-        <label>メールアドレス<input name="email" type="email" autocomplete="email" required></label>
+        <label>お名前<input name="name" type="text" autocomplete="name" maxlength="100" required></label>
+        <label>メールアドレス<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
         <label>ご用件
           <select name="topic">
             <option>映像制作のご依頼</option>
@@ -82,7 +82,9 @@
             <option>その他</option>
           </select>
         </label>
-        <label class="wide">内容<textarea name="message" rows="6" required></textarea></label>
+        <label class="wide">内容<textarea name="message" rows="6" maxlength="5000" required></textarea></label>
+        <!-- ボット対策（人には見えない欄） -->
+        <label class="hp" aria-hidden="true">Website<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
         <div class="wide form-foot">
           <button type="submit" class="btn btn-solid">送信する</button>
           <p class="form-note" id="form-note"></p>

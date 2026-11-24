@@ -4,6 +4,11 @@
 .assetsignore
 .wrangler/
 .wrangler/**
+.dev.vars
 node_modules/
+src/
+src/**
+migrations/
+migrations/**
 wrangler.jsonc
 README.md

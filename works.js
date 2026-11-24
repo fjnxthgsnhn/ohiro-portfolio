@@ -13,7 +13,7 @@ window.PROFILE = {
   ],
   // 問い合わせフォームの送信先（Formspree などのフォーム受付サービスの URL）。
   // 空のあいだはフォームは仮表示で、送信ボタンは押せません。
-  contactAction: "",
+  contactAction: "/api/contact",
 };
 
 window.WORKS = [

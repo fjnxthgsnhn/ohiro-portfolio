@@ -153,6 +153,7 @@ img { display: block; max-width: 100%; }
 .form textarea { resize: vertical; }
 .form input:focus, .form select:focus, .form textarea:focus { outline: 2px solid var(--pink); outline-offset: 1px; border-color: transparent; }
 .form-foot { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-note { margin: 0; color: var(--muted); font-size: 13px; }
 .btn-solid { cursor: pointer; background: var(--pink); border-color: var(--pink); color: #fff; }
 .btn-solid:disabled { cursor: not-allowed; opacity: .45; }
