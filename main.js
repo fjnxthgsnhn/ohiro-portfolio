@@ -75,7 +75,9 @@
 
     // 自作アプリ: 画像＋機能一覧（「使っている道具」には映像の道具だけを集める）
     if (w.app) {
-      const shot = el("div", { class: "app-shot" }, el("img", { src: w.app.image, alt: `${w.title} のアイコン`, loading: "lazy" }));
+      // クリックで原寸の画像を開く
+      const shot = el("a", { class: "app-shot", href: w.app.image, target: "_blank", rel: "noopener" },
+        el("img", { src: w.app.image, alt: `${w.title} の画面`, loading: "lazy" }));
       const mainCol = el("div", { class: "work-main" }, shot, el("p", { class: "cap" }, w.app.caption));
       const info = el("div", { class: "work-info" },
         el("p", { class: "synopsis" }, w.synopsis),
@@ -84,7 +86,7 @@
           ...(w.links || []).map((l) => el("a", { class: "more", href: l.url, target: "_blank", rel: "noopener" }, l.label))));
       const feats = el("ul", { class: "features" },
         ...w.app.features.map((f) => el("li", {}, el("h4", {}, f.title), el("p", {}, f.text))));
-      card.append(head, el("div", { class: "work-body" }, mainCol, info),
+      card.append(head, el("div", { class: "work-body app-body" }, mainCol, info),
         el("p", { class: "shorts-label" }, "Features"), feats);
       $("#works-list").append(card);
       return;

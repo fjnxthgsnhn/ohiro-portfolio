@@ -95,14 +95,15 @@ img { display: block; max-width: 100%; }
 .short figcaption { font-size: 12px; line-height: 1.5; color: var(--muted); margin-top: 8px; }
 
 /* 自作アプリ */
+/* 画面写真は文字が読めるよう横幅いっぱいに出し、説明はその下に置く */
+.app-body { grid-template-columns: 1fr; gap: 20px; }
+.app-body .synopsis { max-width: 46em; }
 .app-shot {
-  aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; display: grid; place-items: center;
-  background:
-    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%),
-    linear-gradient(135deg, var(--bg-2), #221a1a);
-  border: 1px solid var(--line);
+  display: block; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0,0,0,.45);
 }
-.app-shot img { width: 34%; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 12px 30px rgba(0,0,0,.5)); }
+.app-shot img { width: 100%; height: auto; transition: transform .4s; }
+.app-shot:hover img { transform: scale(1.01); }
 .features { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .features li { padding: 18px 20px; border-radius: var(--radius); background: var(--bg-2); border: 1px solid var(--line); }
 .features h4 { margin: 0 0 6px; font-size: 15px; color: var(--accent); }
