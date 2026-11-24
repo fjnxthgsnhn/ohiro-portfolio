@@ -75,19 +75,25 @@
 
     // 自作アプリ: 画像＋機能一覧（「使っている道具」には映像の道具だけを集める）
     if (w.app) {
-      // クリックで原寸の画像を開く
-      const shot = el("a", { class: "app-shot", href: w.app.image, target: "_blank", rel: "noopener" },
-        el("img", { src: w.app.image, alt: `${w.title} の画面`, loading: "lazy" }));
-      const mainCol = el("div", { class: "work-main" }, shot, el("p", { class: "cap" }, w.app.caption));
+      const a = w.app;
+      // 紹介動画（サイト内で再生。読み込みは再生を押してから）
+      const mainCol = el("div", { class: "work-main" },
+        el("video", { class: "app-video", src: a.video, poster: a.poster, controls: "", preload: "none", playsinline: "" }),
+        el("p", { class: "cap" }, a.caption, el("span", {}, a.duration || "")));
       const info = el("div", { class: "work-info" },
         el("p", { class: "synopsis" }, w.synopsis),
         el("ul", { class: "tags" }, ...w.tools.map((t) => el("li", {}, t))),
         el("div", { class: "more-links" },
           ...(w.links || []).map((l) => el("a", { class: "more", href: l.url, target: "_blank", rel: "noopener" }, l.label))));
+      // 画面写真（クリックで原寸）
+      const shot = el("figure", { class: "app-fig" },
+        el("a", { class: "app-shot", href: a.image, target: "_blank", rel: "noopener" },
+          el("img", { src: a.image, alt: `${w.title} の画面`, loading: "lazy" })),
+        el("figcaption", { class: "cap" }, a.imageCaption));
       const feats = el("ul", { class: "features" },
-        ...w.app.features.map((f) => el("li", {}, el("h4", {}, f.title), el("p", {}, f.text))));
-      card.append(head, el("div", { class: "work-body app-body" }, mainCol, info),
-        el("p", { class: "shorts-label" }, "Features"), feats);
+        ...a.features.map((f) => el("li", {}, el("h4", {}, f.title), el("p", {}, f.text))));
+      card.append(head, el("div", { class: "work-body" }, mainCol, info),
+        el("p", { class: "shorts-label" }, "Features"), el("div", { class: "app-detail" }, feats, shot));
       $("#works-list").append(card);
       return;
     }

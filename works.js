@@ -82,8 +82,12 @@ window.WORKS = [
       "AIで生成した画像・動画を目で見てレビューし、気づいたことを Codex / OpenCode への修正指示に整えて渡すデスクトップアプリ。素材の保管・版の管理・コンテ台帳までをワークスペース単位でまとめています。自分のアニメ制作のために作り、日々の制作で使っています。",
     tools: ["Electron", "TypeScript", "React", "SQLite"],
     app: {
+      video: "media/ai-asset-reviewer-promo.mp4",
+      poster: "media/ai-asset-reviewer-promo.jpg",
+      caption: "紹介動画",
+      duration: "1:03",
       image: "media/ai-asset-reviewer.jpg",
-      caption: "キャンバス画面。素材をカードで並べ、右のパネルで判定とレビューを書く",
+      imageCaption: "キャンバス画面。素材をカードで並べ、右のパネルで判定とレビューを書く",
       features: [
         { title: "4状態で素早く判定", text: "未レビュー／レビュー済み／採用／非採用。キーボードだけで次々さばけます。" },
         { title: "画面に直接指摘", text: "画像にはペンや矢印で書き込み、動画には時刻マーカーを複数打って、その場所ごとにコメント。" },
