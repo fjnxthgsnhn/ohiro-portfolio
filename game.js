@@ -536,12 +536,42 @@
     grabKey = "";
   }
 
+  // 「タップ」のアイコン：指先で押すドット絵の手（# = ふち、w = 白）
+  const HAND_SVG = (() => {
+    const map = [
+      "....##......",
+      "...#ww#.....",
+      "...#ww#.....",
+      "...#ww###...",
+      "...#ww#ww##.",
+      ".###ww#ww#w#",
+      "#ww#wwwwwww#",
+      "#wwwwwwwwww#",
+      ".#wwwwwwwww#",
+      "..#wwwwwww#.",
+      "...#wwwwww#.",
+      "...#wwwwww#.",
+      "...########.",
+    ];
+    let rects = "";
+    map.forEach((row, y) => [...row].forEach((c, x) => {
+      if (c !== ".") rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${c === "#" ? "#1a1420" : "#fff"}"/>`;
+    }));
+    return `<svg viewBox="0 0 12 13" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
+  })();
+
   // つかみ手（と案内の文字）を鳩の位置に合わせる
   let grabKey = "";
   function placeGrab() {
     const show = state === "ready" || state === "drag";
     const r = canvas.getBoundingClientRect(), k = r.width / VW;
     const x = (ANCHOR.x - cam.x) * k, y = (ANCHOR.y - cam.y) * k, size = Math.max(72, 46 * k);
+    // ジャンプのアイコンは鳩の右上についていく（画面の外にははみ出さない）
+    if (state === "fly" || state === "slide") {
+      const jx = Math.min(r.width - 52, Math.max(8, (bird.x - cam.x) * k + R * k + 4));
+      const jy = Math.min(r.height - 52, Math.max(8, (bird.y - cam.y) * k - R * k - 44));
+      hud.jump.style.transform = `translate(${jx | 0}px, ${jy | 0}px)`;
+    }
     const key = `${show}|${x | 0}|${y | 0}|${size | 0}`;
     if (key === grabKey) return;
     grabKey = key;
@@ -564,7 +594,8 @@
       <canvas class="game-canvas" aria-hidden="true"></canvas>
       <button type="button" class="game-grab" aria-label="ミニゲーム「鳩とばし」：鳩をうしろへ引っ張って離すと飛びます。Enter キーでも飛ばせます。"></button>
       <p class="game-hint" aria-hidden="true">引っ張って飛ばす<span class="game-best"></span></p>
-      <p class="game-dist"><span class="game-dist-n">0.0</span> m<span class="game-jump">タップで 1 回ジャンプ</span></p>
+      <p class="game-dist"><span class="game-dist-n">0.0</span> m</p>
+      <span class="game-jump" role="img" aria-label="タップで 1 回ジャンプ" title="タップで 1 回ジャンプ">${HAND_SVG}</span>
       <div class="game-result" role="dialog" aria-label="鳩とばしの記録" hidden>
         <img class="game-result-img" src="media/game/pigeon_win.png" alt="">
         <p class="game-result-label">記録</p>
@@ -579,7 +610,7 @@
     scene = document.createElement("canvas"); sctx = scene.getContext("2d");
     grab = root.querySelector(".game-grab");
     const q = (s) => root.querySelector(s);
-    hud = { dist: q(".game-dist-n"), best: q(".game-best"), hint: q(".game-hint"), result: q(".game-result"),
+    hud = { dist: q(".game-dist-n"), best: q(".game-best"), hint: q(".game-hint"), jump: q(".game-jump"), result: q(".game-result"),
       rTotal: q(".r-total"), rFlight: q(".r-flight"), rSlide: q(".r-slide"), rSlideLabel: q(".r-slide-label"),
       rSign: q(".r-sign"), rBest: q(".game-result-best"), again: q(".game-again") };
     grab.addEventListener("pointerdown", onDown);
