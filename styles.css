@@ -192,26 +192,32 @@ img { display: block; max-width: 100%; }
 .game.is-playing { pointer-events: auto; cursor: pointer; }
 /* 「タップで 1 回ジャンプ」のアイコン。鳩の右上についていく（位置は game.js が毎フレーム決める） */
 .game-jump {
-  position: absolute; z-index: 3; left: 0; top: 0; width: 40px; height: 40px; pointer-events: none;
-  display: grid; place-items: center; border-radius: 50%;
+  position: absolute; z-index: 3; left: 0; top: 0; display: flex; align-items: center; gap: 12px;
+  pointer-events: none; transform-origin: 20px 50%; transition: opacity .25s, scale .25s; will-change: transform;
+}
+.game-jump-icon {
+  position: relative; flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%;
   background: rgba(14,13,18,.82); border: 2px solid var(--gold); box-shadow: 0 2px 0 #000;
-  transition: opacity .25s, scale .25s; will-change: transform;
+}
+.game-jump-label {
+  padding: 3px 10px; white-space: nowrap; font-size: 12px; font-weight: 700; line-height: 1.5; color: var(--text);
+  background: rgba(14,13,18,.82); border: 1px solid rgba(242,193,78,.6); border-radius: 999px; box-shadow: 0 2px 0 #000;
 }
 .game-jump svg { width: 22px; height: 24px; image-rendering: pixelated; animation: hato-tap .8s ease-in-out infinite; }
 /* 押しているように見える波紋 */
-.game-jump::before {
+.game-jump-icon::before {
   content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid var(--gold);
   animation: hato-ripple .8s ease-out infinite;
 }
 /* 残り回数 */
-.game-jump::after {
+.game-jump-icon::after {
   content: "×1"; position: absolute; right: -10px; bottom: -6px; padding: 0 4px;
   font: 800 11px/1.4 Inter, sans-serif; color: #000; background: var(--gold); border-radius: 999px;
 }
 @keyframes hato-tap { 50% { transform: translateY(3px) scale(.92); } }
 @keyframes hato-ripple { from { opacity: .9; scale: 1; } to { opacity: 0; scale: 1.6; } }
 .game.is-jumped .game-jump, .game:not(.is-flying) .game-jump { opacity: 0; scale: .6; }
-@media (prefers-reduced-motion: reduce) { .game-jump svg, .game-jump::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .game-jump svg, .game-jump-icon::before { animation: none; } }
 .game-result {
   position: absolute; z-index: 3; left: 50%; top: 50%; translate: -50% -50%; width: min(320px, calc(100% - 32px));
   padding: 20px 20px 22px; text-align: center; pointer-events: auto;

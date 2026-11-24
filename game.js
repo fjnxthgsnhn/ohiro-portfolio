@@ -568,7 +568,7 @@
     const x = (ANCHOR.x - cam.x) * k, y = (ANCHOR.y - cam.y) * k, size = Math.max(72, 46 * k);
     // ジャンプのアイコンは鳩の右上についていく（画面の外にははみ出さない）
     if (state === "fly" || state === "slide") {
-      const jx = Math.min(r.width - 52, Math.max(8, (bird.x - cam.x) * k + R * k + 4));
+      const jx = Math.min(r.width - hud.jump.offsetWidth - 12, Math.max(8, (bird.x - cam.x) * k + R * k + 4));
       const jy = Math.min(r.height - 52, Math.max(8, (bird.y - cam.y) * k - R * k - 44));
       hud.jump.style.transform = `translate(${jx | 0}px, ${jy | 0}px)`;
     }
@@ -595,7 +595,7 @@
       <button type="button" class="game-grab" aria-label="ミニゲーム「鳩とばし」：鳩をうしろへ引っ張って離すと飛びます。Enter キーでも飛ばせます。"></button>
       <p class="game-hint" aria-hidden="true">引っ張って飛ばす<span class="game-best"></span></p>
       <p class="game-dist"><span class="game-dist-n">0.0</span> m</p>
-      <span class="game-jump" role="img" aria-label="タップで 1 回ジャンプ" title="タップで 1 回ジャンプ">${HAND_SVG}</span>
+      <span class="game-jump"><span class="game-jump-icon">${HAND_SVG}</span><span class="game-jump-label">タップでジャンプ</span></span>
       <div class="game-result" role="dialog" aria-label="鳩とばしの記録" hidden>
         <img class="game-result-img" src="media/game/pigeon_win.png" alt="">
         <p class="game-result-label">記録</p>
