@@ -65,6 +65,7 @@
     bird = { x: ANCHOR.x, y: ANCHOR.y, vx: 0, vy: 0, angle: 0, dir: 1, landX: null, bounces: 0, phase: "ready", t: 0 };
     if (!cam) cam = { x: CAM_X0, y: CAM_Y0 }; // もう一回のときはカメラが巻き戻る
     setState("ready");
+    root.classList.remove("is-jumped");
     best = readBest();
     hud.result.hidden = true;
     updateHud();
@@ -77,6 +78,7 @@
     hero.classList.toggle("is-playing", playing);
     root.classList.toggle("is-playing", playing);
     root.classList.toggle("is-ready", s === "ready");
+    root.classList.toggle("is-flying", s === "fly" || s === "slide");
   }
 
   // ---------- 入力（鳩の上に置いた透明なつかみ手で受ける。ページのスクロールは邪魔しない） ----------
@@ -116,6 +118,27 @@
     bird.phase = "fly";
     setState("fly");
     burst(bird.x, bird.y, "#ffffff", 8);
+  }
+  // 発射後に 1 回だけ、自分でジャンプできる（飛行中でも滑走中でも）
+  function jump() {
+    if ((state !== "fly" && state !== "slide") || bird.jumped) return false;
+    bird.jumped = true;
+    bird.vy = Math.min(bird.vy, 0) - 230;
+    bird.vx = Math.max(bird.vx, 0) + 40;
+    if (state === "slide") { bird.y = GROUND - R - 1; setState("fly"); bird.phase = "fly"; }
+    burst(bird.x, bird.y + 6, "#ffffff", 10);
+    popup(bird.x, bird.y - 16, "ジャンプ!", "#ffffff");
+    root.classList.add("is-jumped");
+    return true;
+  }
+  function onTap(e) {
+    if (e.target === grab || e.target.closest(".game-result")) return; // 発射の指離しや結果パネルは除く
+    jump();
+  }
+  function onGlobalKey(e) {
+    if (e.repeat || e.target === grab || !visible) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, button, a")) return;
+    if ((e.key === " " || e.key === "Enter" || e.key === "ArrowUp") && jump()) e.preventDefault();
   }
   // キーボードでは Enter / Space で、ほどよい角度と強さで飛ばす
   function onKey(e) {
@@ -541,7 +564,7 @@
       <canvas class="game-canvas" aria-hidden="true"></canvas>
       <button type="button" class="game-grab" aria-label="ミニゲーム「鳩とばし」：鳩をうしろへ引っ張って離すと飛びます。Enter キーでも飛ばせます。"></button>
       <p class="game-hint" aria-hidden="true">引っ張って飛ばす<span class="game-best"></span></p>
-      <p class="game-dist"><span class="game-dist-n">0.0</span> m</p>
+      <p class="game-dist"><span class="game-dist-n">0.0</span> m<span class="game-jump">タップで 1 回ジャンプ</span></p>
       <div class="game-result" role="dialog" aria-label="鳩とばしの記録" hidden>
         <img class="game-result-img" src="media/game/pigeon_win.png" alt="">
         <p class="game-result-label">記録</p>
@@ -564,7 +587,10 @@
     grab.addEventListener("pointerup", onUp);
     grab.addEventListener("pointercancel", onUp);
     grab.addEventListener("keydown", onKey);
-    hud.again.addEventListener("click", () => { reset(); grab.focus({ preventScroll: true }); });
+    root.addEventListener("click", onTap);
+    window.addEventListener("keydown", onGlobalKey);
+    // つかみ手は次の描画で表示されるので、先に表示してからフォーカスを戻す
+    hud.again.addEventListener("click", () => { reset(); grab.hidden = false; grab.focus({ preventScroll: true }); });
     new ResizeObserver(resize).observe(root);
     // ヒーローが見えていないときは描画を止める
     new IntersectionObserver(([e]) => {
